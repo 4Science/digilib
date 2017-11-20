@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="Date-Revision-yyyymmdd" content="20171120" />
     <meta http-equiv="Content-Language" content="en" />
-    <title>digilib - The Digital Image Library &#x2013; Early history of digilib (in German)</title>
+    <title>digilib - The Digital Image Library &#x2013; Server setups for digilib</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido-1.3.0.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -80,10 +80,12 @@
         How digilib works</a>
             </li>
                   
-      <li class="active">
+      <li>
     
-            <a href="#"><i class="none"></i>Ancient history</a>
-          </li>
+                          <a href="history.html" title="Ancient history">
+          <i class="none"></i>
+        Ancient history</a>
+            </li>
                               <li class="nav-header">Installation</li>
                                 
       <li>
@@ -198,26 +200,44 @@
                 
         <div id="bodyColumn"  class="span9" >
                                   
-            <div class="section">
-<h2><a name="Early_history_of_digilib_in_German"></a>Early history of digilib (in German)</h2>
+            <h1>Server setups for digilib</h1>
+<p>There are a variety of ways to deploy digilib on different server configurations for production sites. </p>
+<p>Here are some examples.</p>
 <div class="section">
-<h3><a name="docuedit_auch_DocumentDatabase_spter_doculight"></a>docuedit (auch DocumentDatabase, sp&#xe4;ter doculight)</h3>
-<p>Imageviewer mit Dokumenten-Baum Ansicht, in Java geschrieben, komplett Client-seitig. Entstanden vor M&#xe4;rz 1998 (m&#xfc;sste am MPIWG gewesen sein). Wesentlicher Autor Michael May (glaube ich).</p>
-<p>Von doculight gibt es hier sogar noch eine &#x201c;Web-Version&#x201d; von Anfang 2000 aus Bern, die aber nicht mehr ganz funktioniert:</p>
-<p><a class="externalLink" href="http://pythia2.unibe.ch/docuserver/viewerlite/frame.htm">http://pythia2.unibe.ch/docuserver/viewerlite/frame.htm</a></p>
-<p>Und hier ist der &#xdc;bergang zur Client-Server L&#xf6;sung &#x201c;gg.jsp&#x201d; (noch ohne serverseitige Skalierung der Seiten) vom Juni 2000, das leider mangels JSP auf dem Server nicht mehr geht: </p>
-<p><a class="externalLink" href="http://pythia2.unibe.ch/docuserver/viewerlite/gg.jsp">http://pythia2.unibe.ch/docuserver/viewerlite/gg.jsp</a></p>
-<p>(Die Kn&#xf6;pfe sind zwar noch schlicht haben aber schon die gleichen Funktionen wie sp&#xe4;ter)</p></div>
-<div class="section">
-<h3><a name="digilib_ScaleServlet_spter_Scaler"></a>digilib (ScaleServlet, sp&#xe4;ter Scaler)</h3>
-<p>Client-Server L&#xf6;sung mit Javascript auf dem Client und Java auf dem Server. Entstanden ca. Juli 2000. Wesentlicher Autor zun&#xe4;chst Robert Gordesch (Stud. Hilfskraft MPIWG) f&#xfc;r den Server-Teil in Java und Gerd Gra&#xdf;hoff (Bern) f&#xfc;rs Javascript (glaube ich), seit Februar 2001 Robert Casties (Bern, ab 2002 MPIWG), danach auch Christian Luginb&#xfc;hl. Seit Anfang 2002 Open Source Projekt bei BerliOS.</p></div></div>
-<div class="section">
-<h2><a name="Articles_on_digilib"></a>Articles on digilib</h2>
+<h2><a name="nginx_as_proxy"></a>nginx as proxy</h2>
+<p>This is an example configuration for <tt>nginx</tt> as a proxy for a single instance of digilib (listening on port <tt>8080</tt>) that handles transport encryption and restricts access to sensitive data to the gateway of a local network (<tt>1.2.3.4</tt>).</p>
 
-<ol style="list-style-type: decimal">
+<div class="source">
+<div class="source">
+<pre>server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name digilib.example.org;
+
+    # this certificate chain shall *not* include the root certificate:
+    ssl_certificate /etc/ssl/certs/digilib.example.org.pem;
+    ssl_certificate_key /etc/ssl/private/digilib.example.org.key;
+
+    include /etc/nginx/proxy_params;
+
+    location ~* .*/(dlConfig|dlRequest).jsp$ {
+        allow 1.2.3.4;
+        deny all;
+        proxy_pass http://localhost:8080;
+    }
+
+    location / {
+        proxy_pass http://localhost:8080;
+    }
+}
+</pre></div></div></div>
+<div class="section">
+<h2><a name="Resources"></a>Resources</h2>
+
+<ul>
   
-<li>Raspe, Martin; Casties, Robert; &#x201c;Digilib: Wissenschaftliches Bildmaterial studieren und kommentierenim Internet&#x201d;, Jahrbuch der Max-Planck-Gesellschaft 2006, <a class="externalLink" href="http://www.mpg.de/411123/pdf.pdf">http://www.mpg.de/411123/pdf.pdf</a></li>
-</ol></div>
+<li>the <a href="nginx.org/en/docs/">nginx documentation</a></li>
+</ul></div>
                   </div>
             </div>
           </div>
