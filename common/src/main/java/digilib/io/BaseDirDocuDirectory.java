@@ -26,8 +26,11 @@ package digilib.io;
  */
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 import digilib.conf.DigilibConfiguration;
 import digilib.io.FileOps.FileClass;
@@ -118,7 +121,11 @@ public class BaseDirDocuDirectory extends DocuDirectory {
     			}
     		}
     	}
-    
+
+		dirMTime = (new Date().getTime() / 1000) * 1000 -1;
+    	// read metadata as well
+    	readMeta();
+
     	File[] fileList = FileOps.listFiles(allFiles, FileOps.filterForClass(fileClass));
     	// number of files in the directory
     	int numFiles = fileList.length;
@@ -144,9 +151,6 @@ public class BaseDirDocuDirectory extends DocuDirectory {
     			d.clearFilenames();
     		}
     	}
-    	dirMTime = dir.lastModified();
-    	// read metadata as well
-    	readMeta();
     	return isValid;
     }
 
