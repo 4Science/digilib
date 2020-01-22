@@ -89,6 +89,10 @@ public class BaseDirDocuDirectory extends DocuDirectory {
     	if (dir.lastModified() <= dirMTime) {
     		return true;
     	}
+
+    	// to be extra safe set as read time 5 sec ago
+    	dirMTime = (new Date().getTime() / 1000 - 5) * 1000;
+    	
     	// read all filenames
     	logger.debug("reading directory "+this+" = "+dir.getPath());
     	File[] allFiles = null;
@@ -121,8 +125,7 @@ public class BaseDirDocuDirectory extends DocuDirectory {
     			}
     		}
     	}
-
-		dirMTime = (new Date().getTime() / 1000) * 1000 -1;
+		
     	// read metadata as well
     	readMeta();
 
